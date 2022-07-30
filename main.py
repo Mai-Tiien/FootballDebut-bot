@@ -1,37 +1,43 @@
+import logging
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import os
-import telebot
-from flask import Flask, request
+PORT = int(os.environ.get('PORT', 5000))
 
-TOKEN = '5499977311:AAGEcFbOSMfXXLGmTRQVLwPsz5LzvGeL3Y0'
-APP_URL = f'https://footballduet-bot.herokuapp.com/{TOKEN}'
-bot = telebot.TeleBot(TOKEN)
-server = Flask(__name__)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+TOKEN = '5499977311:AAFd2fY862MCTE8c4JNvcDybVCWXZQxS-Sg'
 
-@bot.message_handler(commands=['start'])
-def start(message):
-    bot.reply_to(message, 'Hello, ' + message.from_user.first_name)
+def start(update, context):
+    update.message.reply_text('Hi!')
 
+def help(update, context):
+    update.message.reply_text('Help!')
 
-@bot.message_handler(func=lambda message: True, content_types=['text'])
-def echo(message):
-    bot.reply_to(message, message.text)
+def echo(update, context):
+    update.message.reply_text(update.message.text)
 
+def error(update, context):
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
-@server.route('/' + TOKEN, methods=['POST'])
-def get_message():
-    json_string = request.get_data().decode('utf-8')
-    update = telebot.types.Update.de_json(json_string)
-    bot.process_new_updates([update])
-    return '!', 200
+def main():
+    """Start the bot."""
+    updater = Updater(TOKEN, use_context=True)
 
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(MessageHandler(Filters.text, echo))
 
-@server.route('/')
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url=APP_URL)
-    return '!', 200
+    dp.add_error_handler(error)
 
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+    updater.bot.setWebhook('https://footballduet-bot.herokuapp.com/' + TOKEN)
+    updater.idle()
 
 if __name__ == '__main__':
-    server.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    main()
