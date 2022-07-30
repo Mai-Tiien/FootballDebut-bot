@@ -7,7 +7,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-TOKEN = '5499977311:AAFd2fY862MCTE8c4JNvcDybVCWXZQxS-Sg'
+TOKEN = '5556929114:AAEyp-mtv9Xn8d_kr-VC_6j76AMJQtIy_XI'
 
 def start(update, context):
     update.message.reply_text('Hi!')
