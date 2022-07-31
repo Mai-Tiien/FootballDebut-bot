@@ -1,51 +1,41 @@
-import logging
+import telebot
 import os
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from flask import Flask, request
 
-# Enables logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+TOKEN = '5499977311:AAFd2fY862MCTE8c4JNvcDybVCWXZQxS-Sg'
+APP_NAME='https://footballduet-bot.herokuapp.com/'
+bot = telebot.TeleBot(TOKEN)
 
-logger = logging.getLogger(__name__)
+server = Flask(__name__)
 
-PORT = int(os.environ.get('PORT', '8443'))
+@bot.message_handler(content_types=['start'])
+def start(message):
+    bot.send_message(message.from_user.id, "Привіт, надсилай свої ідеї чи контент")       
 
-# We define command handlers. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
-    """Sends a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
-
-
-def help(update, context):
-    update.message.reply_text('Help!')
-
-
-def echo(update, context):
-    update.message.reply_text(update.message.text)
-
-
-def error(update, context):
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
-
-def main():
-    TOKEN = '5499977311:AAFd2fY862MCTE8c4JNvcDybVCWXZQxS-Sg'
-    APP_NAME='https://footballduet-bot.herokuapp.com/' 
+@bot.message_handler(func=lambda message: True, content_types=['text'])
+def echo_message(message):
+    if message.content_type == 'photo':  
+        img = message.photo[2].file_id
+        bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
+        bot.send_photo(986817461, img, message.caption)
+        bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")
+    else:
+        bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
+        bot.send_message(986817461, message.text)
+        bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")
     
-    updater = Updater(TOKEN, use_context=True)
+@server.route('/' + TOKEN, methods=['POST'])
+def getMessage():
+    json_string = request.get_data().decode('utf-8')
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "!", 200
 
-    dp = updater.dispatcher
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=APP_NAME + TOKEN)
+    return "!", 200    
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
-
-
-    dp.add_handler(MessageHandler(Filters.text, echo))
-
-    dp.add_error_handler(error)
-    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=APP_NAME + TOKEN)
-    updater.idle()
-
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
