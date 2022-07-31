@@ -17,17 +17,15 @@ def echo_message(message):
         bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
         bot.send_photo(986817461, img, message.caption)
         bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")    
-    else:
+    elif message.content_type == 'text':
         bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
         bot.send_message(986817461, message.text)
         bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")
-    
-@bot.message_handler(content_types=['video'])  
-def echo_video(message):
-    video = message.video.file_id
-    bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
-    bot.send_video(986817461, video, message.caption)
-    bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")
+    else:
+        video = message.video
+        bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
+        bot.send_video(986817461, video, message.caption)
+        bot.reply_to(message, 'Дякую вам за відео-контентю. Відео відправлено на огляд.')
       
     
 @server.route('/' + TOKEN, methods=['POST'])
