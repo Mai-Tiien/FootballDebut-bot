@@ -1,23 +1,51 @@
-import telebot
-import string
+import logging
+import os
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-TOKEN = '5499977311:AAFd2fY862MCTE8c4JNvcDybVCWXZQxS-Sg'
-bot = telebot.TeleBot(TOKEN)
+# Enables logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
 
-@bot.message_handler(content_types=['text', 'photo'])
-def get_text_messages(message):
+logger = logging.getLogger(__name__)
+
+PORT = int(os.environ.get('PORT', '8443'))
+
+# We define command handlers. Error handlers also receive the raised TelegramError object in error.
+def start(update, context):
+    """Sends a message when the command /start is issued."""
+    update.message.reply_text('Hi!')
+
+
+def help(update, context):
+    update.message.reply_text('Help!')
+
+
+def echo(update, context):
+    update.message.reply_text(update.message.text)
+
+
+def error(update, context):
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
+
+
+def main():
+    TOKEN = '5499977311:AAFd2fY862MCTE8c4JNvcDybVCWXZQxS-Sg'
+    APP_NAME='https://footballduet-bot.herokuapp.com/' 
     
-    if message.text == "/start":
-        bot.send_message(message.from_user.id, "Привіт, надсилай свої ідеї чи контент")    
-    elif message.content_type == 'photo':  
-        img = message.photo[2].file_id
-        bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
-        bot.send_photo(986817461, img, message.caption)
-        bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")
-   
-    else:
-        bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
-        bot.send_message(986817461, message.text)
-        bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")   
-        
-bot.polling(none_stop=True, interval=0)       
+    updater = Updater(TOKEN, use_context=True)
+
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("help", help))
+
+
+    dp.add_handler(MessageHandler(Filters.text, echo))
+
+    dp.add_error_handler(error)
+    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=APP_NAME + TOKEN)
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
