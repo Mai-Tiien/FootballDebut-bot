@@ -8,7 +8,7 @@ bot = telebot.TeleBot(TOKEN)
 
 server = Flask(__name__)       
 
-@bot.message_handler(func=lambda message: True, content_types=['text', 'photo', 'video'])
+@bot.message_handler(func=lambda message: True, content_types=['text', 'photo'])
 def echo_message(message):
     if message.text == '/start':
         bot.send_message(message.from_user.id, "Привіт, надсилай свої ідеї чи контент")  
@@ -17,11 +17,7 @@ def echo_message(message):
         bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
         bot.send_photo(986817461, img, message.caption)
         bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")
-    elif message.content_type == 'video':
-        vid = message.video.file_id
-        bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
-        bot.send_video(986817461, vid, message.caption)
-        bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")
+   
     else:
         bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
         bot.send_message(986817461, message.text)
