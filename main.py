@@ -22,6 +22,12 @@ def echo_message(message):
         bot.send_message(986817461, message.text)
         bot.reply_to(message, "Дякую *{name}* за співпрацю! Контент відправлено на огляд.".format(name=message.chat.first_name, text=message.text), parse_mode="Markdown")
       
+
+@bot.message_handler(func=lambda message: True, content_types=['video', 'video_note'])
+def echo_video(message):
+    bot.send_message(986817461, "Відправка відео від @{name} десь там 👇".format(name=message.chat.first_name), parse_mode="Markdown")
+    bot.send_video(986817461, message.video.file_id, timeout=10)
+    bot.reply_to(message, "Дякую за відео-контент! Контент відправлено на огляд.")
     
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
