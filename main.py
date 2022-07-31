@@ -6,18 +6,13 @@ TOKEN = '5499977311:AAFd2fY862MCTE8c4JNvcDybVCWXZQxS-Sg'
 APP_NAME='https://footballduet-bot.herokuapp.com/'
 bot = telebot.TeleBot(TOKEN)
 
-server = Flask(__name__)
+server = Flask(__name__)       
 
-@bot.message_handler(content_types=['start'])
-def start(message):
+@bot.message_handler(func=lambda message: True, content_types=['text', 'photo'])
+def echo_message(message):
     if message.text == '/start':
         bot.send_message(message.from_user.id, "Привіт, надсилай свої ідеї чи контент")  
-    else:
-        bot.send_message(message.from_user.id, "Помилка! Буль-ласка, повторіть ще раз!")          
-
-@bot.message_handler(func=lambda message: True, content_types=['text'])
-def echo_message(message):
-    if message.content_type == 'photo':  
+    elif message.content_type == 'photo':  
         img = message.photo[2].file_id
         bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
         bot.send_photo(986817461, img, message.caption)
