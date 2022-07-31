@@ -7,12 +7,8 @@ bot = telebot.TeleBot(TOKEN)
 @bot.message_handler(content_types=['text', 'photo'])
 def get_text_messages(message):
     
-    result = sum([i.strip(string.punctuation).isalpha() for i in message.text.split()])
-    
     if message.text == "/start":
-        bot.send_message(message.from_user.id, "Привіт, надсилай свої ідеї чи контент")   
-    elif int(result) < 5:
-        bot.reply_to(message, "Опис має бути не меньше пять слів. Будь-ласка, спробуйте ще раз!")   
+        bot.send_message(message.from_user.id, "Привіт, надсилай свої ідеї чи контент")    
     elif message.content_type == 'photo':  
         img = message.photo[2].file_id
         bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
