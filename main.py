@@ -29,6 +29,11 @@ def echo_video(message):
     bot.send_video(986817461, message.video.file_id, timeout=10)
     bot.reply_to(message, "Дякую за відео-контент! Контент відправлено на огляд.")
     
+@ bot.message_handler(func=lambda message: True, content_types=['video', 'video_note'])
+def echo_news(message):
+    if message.text == '/news':
+        bot.send_message(message.from_user.id, "Привіт, адмін зараз в процесі розробки!")  
+
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
     json_string = request.get_data().decode('utf-8')
