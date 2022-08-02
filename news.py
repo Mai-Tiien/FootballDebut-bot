@@ -1,5 +1,3 @@
-from asyncio import sleep
-from cgitb import reset
 from bs4 import BeautifulSoup
 import requests
 from googletrans import Translator
@@ -34,4 +32,3 @@ def football(keyword):
     with open('out.txt', encoding='utf-8') as f:
         contents = f.read()        
     return contents
-football('football')
