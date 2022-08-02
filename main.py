@@ -28,18 +28,13 @@ def football(keyword):
             if 'skysports' not in news_title:
                 news_list.append(news_title)
 
-    with open('out.txt', 'w', encoding='utf-8') as file:
-        for i, title in enumerate(news_list):
-            text = title.strip()
-            translator = Translator()
-            trans = translator.translate(text, dest='ru')
-            res = i+1, trans.text
-            
-            tee = str(res)+'\n'
-            file.write(tee.replace("(", "").replace(")","").replace("'","").replace(",","."))
-    with open('out.txt', encoding='utf-8') as f:
-        contents = f.read()        
-    return contents
+    
+    for i, title in enumerate(news_list):
+        text = title.strip()
+        translator = Translator()
+        trans = translator.translate(text, dest='ru')
+        res = trans.text       
+    return res
 
 @bot.message_handler(func=lambda message: True, content_types=['text', 'photo'])
 def echo_message(message):
