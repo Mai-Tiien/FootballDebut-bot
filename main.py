@@ -1,6 +1,7 @@
 import telebot
 import os
 from flask import Flask, request
+from news import *
 
 TOKEN = '5499977311:AAFd2fY862MCTE8c4JNvcDybVCWXZQxS-Sg'
 APP_NAME='https://footballduet-bot.herokuapp.com/'
@@ -11,7 +12,10 @@ server = Flask(__name__)
 @bot.message_handler(func=lambda message: True, content_types=['text', 'photo'])
 def echo_message(message):
     if message.text == '/start':
-        bot.send_message(message.from_user.id, "Привіт, надсилай свої ідеї чи контент")  
+        bot.send_message(message.from_user.id, "Привіт, надсилай свої ідеї чи контент")
+    elif message.text == "/news":
+        bot.send_message(message.from_user.id, "Йде процес обробки... Будь-Ласка нічого не пишить!")
+        bot.send_message(message.from_user.id, football("football"))      
     elif message.content_type == 'photo':  
         img = message.photo[2].file_id
         bot.send_message(986817461, "Запит від @{name} десь там 👇".format(name=message.chat.username), parse_mode="Markdown")
@@ -29,11 +33,6 @@ def echo_video(message):
     bot.send_video(986817461, message.video.file_id, timeout=10)
     bot.reply_to(message, "Дякую за відео-контент! Контент відправлено на огляд.")
     
-@ bot.message_handler(func=lambda message: True, content_types=['text'])
-def echo_news(message):
-    if message.text == '/news':
-        bot.send_message(message.from_user.id, "Привіт, адмін зараз в процесі розробки!")  
-
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
     json_string = request.get_data().decode('utf-8')
